@@ -64,6 +64,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NuvayuTech/react-search-highlight.git"
+    "url": "git+https://github.com/NuvayuTech/react-search-highlight.git"
   }
 }
