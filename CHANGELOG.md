@@ -5,19 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.1] - 2026-02-25
-
-### Added
-- `searchBoxTooltips` / `tooltips` prop — customizable tooltip text for Previous, Next, and Close buttons (no tooltips by default; opt-in only)
-- `SearchBoxTooltips` type exported from the package
-
-### Fixed
-- React StrictMode compatibility — `isMountedRef` is now reset to `true` on remount, preventing silent no-ops in `safeRAF` callbacks and `processHighlightsAsync`
-- Memory leak prevention — uncancelled `requestAnimationFrame` callbacks and post-unmount `setState` calls are now properly guarded via `safeRAF` helper and `isMountedRef`
-- Previous/Next buttons no longer flicker (disable/enable) while typing — buttons stay enabled as long as matches exist from the previous search
-- ESLint errors resolved — `FrameRequestCallback` type, `cancelAnimationFrame` global, and `rafIdsRef.current` in effect cleanup
-
-## [1.0.0] - 2026-02-24
+## [1.0.0] - 2026-02-25
 
 ### Added
 - Initial release of react-search-highlight
@@ -27,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full TypeScript support with comprehensive type definitions
 - Customizable CSS class injection via `searchBoxClassNames` prop
 - Custom icon injection via `searchBoxIcons` prop
+- Customizable button tooltips via `searchBoxTooltips` prop (opt-in, no tooltips by default)
+- `SearchBoxTooltips` type exported from the package
 - Search options configuration:
   - `highlightColor` - Color for all matches
   - `currentHighlightColor` - Color for current match
@@ -39,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Keyboard shortcuts (Ctrl/Cmd+F, Enter, Escape)
 - Performance optimizations (debouncing, chunked rendering, requestIdleCallback)
 - Accessibility features (ARIA labels, keyboard navigation)
+- Memory leak prevention via `safeRAF` helper and `isMountedRef` guard
+- React StrictMode compatibility
 - Browser native search override
 - Search blocking capability for modals/overlays
 - Comprehensive documentation and examples
@@ -56,5 +48,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Whole word matching option
 - Responsive and mobile-friendly
 
-[1.0.1]: https://github.com/NuvayuTech/react-search-highlight/releases/tag/v1.0.1
 [1.0.0]: https://github.com/NuvayuTech/react-search-highlight/releases/tag/v1.0.0
