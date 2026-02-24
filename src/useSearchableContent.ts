@@ -1,342 +1,34 @@
 import { useState, useEffect, useRef, useCallback, useMemo, RefObject } from 'react';
 
-// ─── Keyboard Shortcut ───────────────────────────────────────────────────────
+import type {
+  KeyboardShortcut,
+  ScrollOptions,
+  HighlightStyle,
+  PerformanceOptions,
+  SearchCallbacks,
+  SearchOptions,
+  ResolvedSearchOptions,
+  TextNodeInfo,
+  TextRange,
+  Match,
+  UseSearchableContentReturn,
+} from './types';
 
-export interface KeyboardShortcut {
-  /** The key to listen for (e.g., 'f', 'k', '/') */
-  key: string;
-  /** Require Ctrl key */
-  ctrl?: boolean;
-  /** Require Meta/Cmd key */
-  meta?: boolean;
-  /** Require Shift key */
-  shift?: boolean;
-  /** Require Alt/Option key */
-  alt?: boolean;
-}
+import { getTextNodesWithOffsets, findNodeAtOffset, getTextFromNodes } from './utils/dom';
+import { createHighlight, buildHighlightsByIndex, buildMatchObjects, yieldToMainThread } from './utils/highlight';
 
-// ─── Scroll Options ──────────────────────────────────────────────────────────
-
-export interface ScrollOptions {
-  /** Scroll behavior when navigating matches */
-  behavior?: ScrollBehavior;
-  /** Vertical alignment of match in viewport */
-  block?: ScrollLogicalPosition;
-  /** Horizontal alignment of match in viewport */
-  inline?: ScrollLogicalPosition;
-}
-
-// ─── Highlight Style ─────────────────────────────────────────────────────────
-
-export interface HighlightStyle {
-  /** Border radius for highlights (default: '2px') */
-  borderRadius?: string;
-  /** Border for highlights (e.g., '1px solid red') */
-  border?: string;
-  /** Box shadow for highlights (e.g., '0 0 4px rgba(0,0,0,0.3)') */
-  boxShadow?: string;
-  /** Opacity for highlights (0-1) */
-  opacity?: number;
-  /** z-index for the overlay layer (default: 999) */
-  zIndex?: number;
-  /** Custom CSS class to add to each highlight element */
-  className?: string;
-  /** Custom CSS class to add to the current/active highlight */
-  activeClassName?: string;
-}
-
-// ─── Performance Options ─────────────────────────────────────────────────────
-
-export interface PerformanceOptions {
-  /** Number of highlights to process per chunk (default: 50) */
-  chunkSize?: number;
-  /** Use requestIdleCallback when available (default: true) */
-  useIdleCallback?: boolean;
-  /** Timeout for idle callback in ms (default: 100) */
-  idleCallbackTimeout?: number;
-}
-
-// ─── Lifecycle Callbacks ─────────────────────────────────────────────────────
-
-export interface SearchCallbacks {
-  /** Called when search starts */
-  onSearchStart?: (searchTerm: string) => void;
-  /** Called when search completes with results */
-  onSearchComplete?: (searchTerm: string, matchCount: number) => void;
-  /** Called when matches are found/updated */
-  onMatchesFound?: (matches: Match[], totalCount: number) => void;
-  /** Called when the current active match changes */
-  onCurrentMatchChange?: (match: Match | null, index: number) => void;
-  /** Called when max highlights limit is reached */
-  onMaxHighlightsReached?: (limit: number) => void;
-}
-
-// ─── Search Options ──────────────────────────────────────────────────────────
-
-export interface SearchOptions {
-  /** Override browser's native search with Ctrl+F / Cmd+F */
-  disableBrowserSearch?: boolean;
-  /** Background color for all matches */
-  highlightColor?: string;
-  /** Background color for the current/active match */
-  currentHighlightColor?: string;
-  /** Enable case-sensitive search */
-  caseSensitive?: boolean;
-  /** Match whole words only */
-  wholeWord?: boolean;
-  /** Debounce delay in milliseconds */
-  debounceMs?: number;
-  /** Minimum search term length to trigger search */
-  minSearchLength?: number;
-  /** Maximum number of highlights to render */
-  maxHighlights?: number;
-  /** Custom keyboard shortcut to open search (default: Ctrl/Cmd+F) */
-  keyboardShortcut?: KeyboardShortcut;
-  /** Scroll behavior when navigating to matches */
-  scrollOptions?: ScrollOptions;
-  /** Custom highlight element styling */
-  highlightStyle?: HighlightStyle;
-  /** Performance tuning options */
-  performance?: PerformanceOptions;
-  /** CSS selector for elements to exclude from search (e.g., '.no-search, [data-no-search]') */
-  excludeSelector?: string;
-  /** Custom text normalization function applied before matching (e.g., remove accents) */
-  normalizeText?: (text: string) => string;
-}
-
-// ─── Resolved config type (all required) ─────────────────────────────────────
-
-export interface ResolvedSearchOptions {
-  disableBrowserSearch: boolean;
-  highlightColor: string;
-  currentHighlightColor: string;
-  caseSensitive: boolean;
-  wholeWord: boolean;
-  debounceMs: number;
-  minSearchLength: number;
-  maxHighlights: number;
-  keyboardShortcut: KeyboardShortcut;
-  scrollOptions: Required<ScrollOptions>;
-  highlightStyle: Required<HighlightStyle>;
-  performance: Required<PerformanceOptions>;
-  excludeSelector: string;
-  normalizeText: (text: string) => string;
-}
-
-export interface TextRange {
-  start: number;
-  end: number;
-  text: string;
-}
-
-export interface Match {
-  index: number;
-  highlights: HTMLDivElement[];
-  text: string;
-}
-
-// ─── Pre-computed text node info for O(log n) lookups ────────────────────────
-
-interface TextNodeInfo {
-  node: Text;
-  /** Accumulated character offset where this node starts */
-  start: number;
-  /** Accumulated character offset where this node ends (exclusive) */
-  end: number;
-}
-
-export interface UseSearchableContentReturn {
-  searchTerm: string;
-  isSearchOpen: boolean;
-  /** Whether an async highlight-rendering pass is in progress */
-  isSearching: boolean;
-  matches: Match[];
-  currentIndex: number;
-  searchInputRef: RefObject<HTMLInputElement>;
-  search: (term: string) => void;
-  goToNext: () => void;
-  goToPrevious: () => void;
-  openSearch: () => void;
-  closeSearch: () => void;
-  setSearchTerm: (term: string) => void;
-  /** Programmatically refresh highlights (e.g., after dynamic content change) */
-  refresh: () => void;
-  config: ResolvedSearchOptions;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Utility functions — pure helpers, no React state
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Collect all text nodes under `root` with pre-computed character offsets.
- *
- * Uses **TreeWalker** with `FILTER_REJECT` so excluded-subtrees and the
- * highlight overlay are skipped entirely (O(1) per skipped subtree instead
- * of O(n) per child node).
- */
-const getTextNodesWithOffsets = (
-  root: HTMLElement,
-  excludeSelector: string
-): TextNodeInfo[] => {
-  const nodes: TextNodeInfo[] = [];
-
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ALL, {
-    acceptNode: (node: Node) => {
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        // Skip the highlight overlay subtree
-        if ((node as Element).classList?.contains('text-search-overlay')) {
-          return NodeFilter.FILTER_REJECT;
-        }
-        // Skip excluded elements and their entire subtree
-        if (excludeSelector) {
-          try {
-            if ((node as Element).matches(excludeSelector)) {
-              return NodeFilter.FILTER_REJECT;
-            }
-          } catch {
-            /* invalid selector — don't skip */
-          }
-        }
-        // Process children of this element but don't include the element itself
-        return NodeFilter.FILTER_SKIP;
-      }
-      if (node.nodeType === Node.TEXT_NODE) {
-        return NodeFilter.FILTER_ACCEPT;
-      }
-      return NodeFilter.FILTER_SKIP;
-    },
-  });
-
-  let offset = 0;
-  let current: Node | null;
-  while ((current = walker.nextNode())) {
-    const textNode = current as Text;
-    const len = textNode.length;
-    nodes.push({ node: textNode, start: offset, end: offset + len });
-    offset += len;
-  }
-
-  return nodes;
-};
-
-/**
- * Binary-search the pre-computed text-node array for the node at `offset`.
- *
- * @param isEnd — when `true`, allows `offset === node.end` (valid for
- *                `Range.setEnd` which accepts the boundary *after* the
- *                last character).
- *
- * Complexity: O(log m) where m = number of text nodes.
- * (Previous approach: linear scan via NodeIterator → O(m) **per range**.)
- */
-const findNodeAtOffset = (
-  nodes: TextNodeInfo[],
-  offset: number,
-  isEnd = false
-): { node: Text; localOffset: number } | null => {
-  let lo = 0;
-  let hi = nodes.length - 1;
-
-  while (lo <= hi) {
-    const mid = (lo + hi) >>> 1;
-    const { start, end } = nodes[mid];
-
-    if (offset < start) {
-      hi = mid - 1;
-    } else if (isEnd ? offset > end : offset >= end) {
-      lo = mid + 1;
-    } else {
-      return { node: nodes[mid].node, localOffset: offset - start };
-    }
-  }
-  return null;
-};
-
-/** Extract plain text from pre-computed text nodes (consistent with node offsets). */
-const getTextFromNodes = (nodes: TextNodeInfo[]): string => {
-  let text = '';
-  for (const n of nodes) {
-    text += n.node.textContent ?? '';
-  }
-  return text;
-};
-
-/** Create a single positioned highlight `<div>`. */
-const createHighlight = (
-  rect: DOMRect,
-  index: number,
-  config: ResolvedSearchOptions,
-  containerRect: DOMRect,
-  scrollLeft: number,
-  scrollTop: number
-): HTMLDivElement => {
-  const highlight = document.createElement('div');
-  highlight.className = `text-search-highlight${
-    config.highlightStyle.className ? ` ${config.highlightStyle.className}` : ''
-  }`;
-  highlight.dataset.index = String(index);
-
-  const x = rect.left - containerRect.left + scrollLeft;
-  const y = rect.top - containerRect.top + scrollTop;
-  const style = config.highlightStyle;
-
-  let css = `
-    position: absolute;
-    transform: translate(${x}px, ${y}px);
-    width: ${rect.width}px;
-    height: ${rect.height}px;
-    background-color: ${config.highlightColor};
-    border-radius: ${style.borderRadius};
-    pointer-events: none;
-    will-change: background-color;
-    contain: layout style paint;
-  `;
-  if (style.border) css += `border: ${style.border};`;
-  if (style.boxShadow) css += `box-shadow: ${style.boxShadow};`;
-  if (style.opacity !== undefined && style.opacity < 1) css += `opacity: ${style.opacity};`;
-
-  highlight.style.cssText = css;
-  return highlight;
-};
-
-const buildHighlightsByIndex = (
-  highlights: HTMLDivElement[]
-): Record<number, HTMLDivElement[]> => {
-  const highlightsByIndex: Record<number, HTMLDivElement[]> = {};
-  for (const highlight of highlights) {
-    const index = Number.parseInt(highlight.dataset.index || '-1');
-    if (!highlightsByIndex[index]) highlightsByIndex[index] = [];
-    highlightsByIndex[index].push(highlight);
-  }
-  return highlightsByIndex;
-};
-
-const buildMatchObjects = (
-  highlightsByIndex: Record<number, HTMLDivElement[]>,
-  ranges: TextRange[]
-): Match[] => {
-  return Object.keys(highlightsByIndex).map((index) => ({
-    index: Number.parseInt(index),
-    highlights: highlightsByIndex[Number(index)],
-    text: ranges[Number(index)].text,
-  }));
-};
-
-/**
- * Yield control to the main thread between chunks.
- * Uses `requestIdleCallback` when enabled + available, otherwise `requestAnimationFrame`.
- */
-const yieldToMainThread = (perf: Required<PerformanceOptions>): Promise<void> => {
-  return new Promise((resolve) => {
-    if (perf.useIdleCallback && 'requestIdleCallback' in window) {
-      window.requestIdleCallback(() => resolve(), {
-        timeout: perf.idleCallbackTimeout,
-      });
-    } else {
-      requestAnimationFrame(() => resolve());
-    }
-  });
+// Re-export types so existing `import { … } from './useSearchableContent'` still works
+export type {
+  KeyboardShortcut,
+  ScrollOptions,
+  HighlightStyle,
+  PerformanceOptions,
+  SearchCallbacks,
+  SearchOptions,
+  ResolvedSearchOptions,
+  TextRange,
+  Match,
+  UseSearchableContentReturn,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -846,90 +538,65 @@ export const useSearchableContent = (
     [performSearch]
   );
 
-  // ─── Match navigation ─────────────────────────────────────────────
+  // ─── Match navigation (DRY helper) ────────────────────────────────
+
+  /**
+   * Navigate to a specific match index, updating highlight colors and
+   * scrolling the target into view.
+   */
+  const navigateToMatch = useCallback(
+    (newIndex: number) => {
+      if (matches.length === 0) return;
+
+      setCurrentIndex(newIndex);
+      callbacksRef.current.onCurrentMatchChange?.(
+        matches[newIndex] ?? null,
+        newIndex
+      );
+
+      requestAnimationFrame(() => {
+        // Reset all highlights to default color
+        for (const h of highlightsRef.current) {
+          h.style.backgroundColor = config.highlightColor;
+          if (config.highlightStyle.activeClassName) {
+            h.classList.remove(config.highlightStyle.activeClassName);
+          }
+        }
+
+        // Activate the target match
+        if (matches[newIndex]?.highlights) {
+          for (const h of matches[newIndex].highlights) {
+            h.style.backgroundColor = config.currentHighlightColor;
+            if (config.highlightStyle.activeClassName) {
+              h.classList.add(config.highlightStyle.activeClassName);
+            }
+          }
+          matches[newIndex].highlights[0]?.scrollIntoView({
+            behavior: config.scrollOptions.behavior,
+            block: config.scrollOptions.block,
+            inline: config.scrollOptions.inline,
+          });
+        }
+      });
+    },
+    [
+      matches,
+      config.highlightColor,
+      config.currentHighlightColor,
+      config.scrollOptions,
+      config.highlightStyle.activeClassName,
+    ]
+  );
 
   const goToNext = useCallback(() => {
     if (matches.length === 0) return;
-
-    const nextIndex = (currentIndex + 1) % matches.length;
-    setCurrentIndex(nextIndex);
-    callbacksRef.current.onCurrentMatchChange?.(
-      matches[nextIndex] ?? null,
-      nextIndex
-    );
-
-    requestAnimationFrame(() => {
-      for (const h of highlightsRef.current) {
-        h.style.backgroundColor = config.highlightColor;
-        if (config.highlightStyle.activeClassName) {
-          h.classList.remove(config.highlightStyle.activeClassName);
-        }
-      }
-
-      if (matches[nextIndex]?.highlights) {
-        for (const h of matches[nextIndex].highlights) {
-          h.style.backgroundColor = config.currentHighlightColor;
-          if (config.highlightStyle.activeClassName) {
-            h.classList.add(config.highlightStyle.activeClassName);
-          }
-        }
-        matches[nextIndex].highlights[0]?.scrollIntoView({
-          behavior: config.scrollOptions.behavior,
-          block: config.scrollOptions.block,
-          inline: config.scrollOptions.inline,
-        });
-      }
-    });
-  }, [
-    matches,
-    currentIndex,
-    config.highlightColor,
-    config.currentHighlightColor,
-    config.scrollOptions,
-    config.highlightStyle.activeClassName,
-  ]);
+    navigateToMatch((currentIndex + 1) % matches.length);
+  }, [matches.length, currentIndex, navigateToMatch]);
 
   const goToPrevious = useCallback(() => {
     if (matches.length === 0) return;
-
-    const prevIndex =
-      currentIndex <= 0 ? matches.length - 1 : currentIndex - 1;
-    setCurrentIndex(prevIndex);
-    callbacksRef.current.onCurrentMatchChange?.(
-      matches[prevIndex] ?? null,
-      prevIndex
-    );
-
-    requestAnimationFrame(() => {
-      for (const h of highlightsRef.current) {
-        h.style.backgroundColor = config.highlightColor;
-        if (config.highlightStyle.activeClassName) {
-          h.classList.remove(config.highlightStyle.activeClassName);
-        }
-      }
-
-      if (matches[prevIndex]?.highlights) {
-        for (const h of matches[prevIndex].highlights) {
-          h.style.backgroundColor = config.currentHighlightColor;
-          if (config.highlightStyle.activeClassName) {
-            h.classList.add(config.highlightStyle.activeClassName);
-          }
-        }
-        matches[prevIndex].highlights[0]?.scrollIntoView({
-          behavior: config.scrollOptions.behavior,
-          block: config.scrollOptions.block,
-          inline: config.scrollOptions.inline,
-        });
-      }
-    });
-  }, [
-    matches,
-    currentIndex,
-    config.highlightColor,
-    config.currentHighlightColor,
-    config.scrollOptions,
-    config.highlightStyle.activeClassName,
-  ]);
+    navigateToMatch(currentIndex <= 0 ? matches.length - 1 : currentIndex - 1);
+  }, [matches.length, currentIndex, navigateToMatch]);
 
   // ─── Open / Close ──────────────────────────────────────────────────
 

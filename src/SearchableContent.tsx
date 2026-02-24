@@ -1,13 +1,16 @@
 import React, { useRef, useEffect, ReactNode } from 'react';
-import { useSearchableContent, SearchOptions, SearchCallbacks } from './useSearchableContent';
-import {
-  SearchBox,
+
+import { useSearchableContent } from './useSearchableContent';
+import { SearchBox } from './SearchBox';
+import type {
+  SearchOptions,
+  SearchCallbacks,
   SearchBoxClassNames,
   SearchBoxIcons,
   SearchBoxPosition,
   SearchBoxAriaLabels,
   SearchBoxRenderProps,
-} from './SearchBox';
+} from './types';
 
 export interface SearchableContentProps {
   /** Content to make searchable */

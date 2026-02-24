@@ -1,117 +1,23 @@
-import React, { RefObject } from 'react';
-import { Match } from './useSearchableContent';
+import React from 'react';
 
-export interface SearchBoxClassNames {
-  /** Class for the search box container */
-  container?: string;
-  /** Class for the search input wrapper */
-  inputWrapper?: string;
-  /** Class for the search input field */
-  input?: string;
-  /** Class for the match counter text */
-  counter?: string;
-  /** Class for navigation buttons */
-  button?: string;
-  /** Class for disabled buttons */
-  buttonDisabled?: string;
-  /** Class for the divider element */
-  divider?: string;
-  /** Class for icon wrapper */
-  iconWrapper?: string;
-  /** Class for the loading spinner */
-  spinner?: string;
-}
+import type {
+  SearchBoxClassNames,
+  SearchBoxIcons,
+  SearchBoxPosition,
+  SearchBoxAriaLabels,
+  SearchBoxRenderProps,
+  SearchBoxProps,
+} from './types';
 
-export interface SearchBoxIcons {
-  /** Icon component for search */
-  search?: React.ReactNode;
-  /** Icon component for previous/up navigation */
-  previous?: React.ReactNode;
-  /** Icon component for next/down navigation */
-  next?: React.ReactNode;
-  /** Icon component for close button */
-  close?: React.ReactNode;
-  /** Icon component or element for loading state */
-  loading?: React.ReactNode;
-}
-
-/** Predefined search box positions */
-export type SearchBoxPosition =
-  | 'top-left'
-  | 'top-right'
-  | 'top-center'
-  | 'bottom-left'
-  | 'bottom-right'
-  | 'bottom-center'
-  | 'custom';
-
-/** ARIA labels for i18n / accessibility customization */
-export interface SearchBoxAriaLabels {
-  /** Label for the search input (default: 'Search text') */
-  searchInput?: string;
-  /** Label for previous button (default: 'Previous match') */
-  previousButton?: string;
-  /** Label for next button (default: 'Next match') */
-  nextButton?: string;
-  /** Label for close button (default: 'Close search') */
-  closeButton?: string;
-  /** Live region label for match status (default: '{current} of {total} matches') */
-  matchStatus?: string;
-}
-
-/** Props passed to custom render functions */
-export interface SearchBoxRenderProps {
-  searchTerm: string;
-  matches: Match[];
-  currentIndex: number;
-  totalMatches: number;
-  isSearching: boolean;
-  searchInputRef: RefObject<HTMLInputElement>;
-  onSearch: (term: string) => void;
-  onNext: () => void;
-  onPrevious: () => void;
-  onClose: () => void;
-  isPreviousDisabled: boolean;
-  isNextDisabled: boolean;
-  statusText: string;
-}
-
-export interface SearchBoxProps {
-  /** Current search term */
-  searchTerm: string;
-  /** Whether the search box is visible */
-  isSearchOpen: boolean;
-  /** Array of found matches */
-  matches: Match[];
-  /** Index of currently active match */
-  currentIndex: number;
-  /** Whether search is in progress */
-  isSearching?: boolean;
-  /** Ref for the search input element */
-  searchInputRef: RefObject<HTMLInputElement>;
-  /** Callback when search term changes */
-  onSearch: (term: string) => void;
-  /** Callback to navigate to next match */
-  onNext: () => void;
-  /** Callback to navigate to previous match */
-  onPrevious: () => void;
-  /** Callback to close search */
-  onClose: () => void;
-  /** Custom CSS class names for styling */
-  classNames?: SearchBoxClassNames;
-  /** Custom icons for buttons */
-  icons?: SearchBoxIcons;
-  /** Placeholder text for search input */
-  placeholder?: string;
-  /** Predefined position for the search box (default: 'top-right') */
-  position?: SearchBoxPosition;
-  /** Custom inline styles for the search box container (use with position='custom') */
-  containerStyle?: React.CSSProperties;
-  /** Custom ARIA labels for accessibility / i18n */
-  ariaLabels?: SearchBoxAriaLabels;
-  /** Render function for completely custom search box UI */
-  renderSearchBox?: (props: SearchBoxRenderProps) => React.ReactNode;
-}
+// Re-export types so existing `import { … } from './SearchBox'` still works
+export type {
+  SearchBoxClassNames,
+  SearchBoxIcons,
+  SearchBoxPosition,
+  SearchBoxAriaLabels,
+  SearchBoxRenderProps,
+  SearchBoxProps,
+};
 
 const defaultIcons: Required<SearchBoxIcons> = {
   search: (
