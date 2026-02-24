@@ -122,6 +122,7 @@ const defaultStyles = {
     gap: 8,
     padding: '8px 16px',
     background: '#ffffff',
+    color: '#1e293b',
     border: '1px solid #e2e8f0',
     borderRadius: 12,
     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06)',
@@ -141,14 +142,15 @@ const defaultStyles = {
     outline: 'none',
     border: 'none',
     fontSize: 14,
-    color: '#1e293b',
+    color: 'inherit',
     minWidth: 140,
   } as React.CSSProperties,
   counter: {
     margin: '0 4px',
     fontSize: 13,
     whiteSpace: 'nowrap' as const,
-    color: '#64748b',
+    color: 'inherit',
+    opacity: 0.6,
     userSelect: 'none' as const,
     minWidth: 50,
     textAlign: 'center' as const,
@@ -162,7 +164,7 @@ const defaultStyles = {
     border: 'none',
     borderRadius: 6,
     cursor: 'pointer',
-    color: '#475569',
+    color: 'inherit',
     transition: 'background 0.15s, color 0.15s',
   } as React.CSSProperties,
   buttonDisabled: {
@@ -172,7 +174,8 @@ const defaultStyles = {
   divider: {
     width: 1,
     height: 20,
-    background: '#e2e8f0',
+    background: 'currentColor',
+    opacity: 0.2,
     margin: '0 4px',
   } as React.CSSProperties,
   iconWrapper: {
@@ -316,7 +319,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
       aria-label="In-page search"
     >
       <div className={mergedClassNames.inputWrapper} style={defaultStyles.inputWrapper}>
-        <div className={mergedClassNames.iconWrapper} style={{ ...defaultStyles.iconWrapper, color: '#94a3b8' }}>
+        <div className={mergedClassNames.iconWrapper} style={{ ...defaultStyles.iconWrapper, opacity: 0.5 }}>
           {mergedIcons.search}
         </div>
         <input
