@@ -631,6 +631,109 @@ const [isModalOpen, setIsModalOpen] = useState(false);
 </SearchableContent>
 ```
 
+### 6. Knowledge Base / FAQ
+```tsx
+<SearchableContent
+  searchOptions={{ wholeWord: true, maxHighlights: 200 }}
+  searchPlaceholder="Search FAQs..."
+  searchBoxPosition="top-center"
+>
+  <FAQAccordion items={faqs} />
+</SearchableContent>
+```
+
+### 7. Data Table Search
+```tsx
+<SearchableContent
+  searchOptions={{
+    debounceMs: 150,
+    excludeSelector: '.table-header, .table-footer',
+    performance: { chunkSize: 100 },
+  }}
+  searchCallbacks={{
+    onMatchesFound: (matches) => setMatchCount(matches.length),
+  }}
+>
+  <DataTable rows={rows} columns={columns} />
+</SearchableContent>
+```
+
+### 8. Legal / Long-Form Document Viewer
+```tsx
+<SearchableContent
+  searchOptions={{
+    maxHighlights: 1000,
+    performance: { chunkSize: 200, useIdleCallback: true },
+    scrollOptions: { behavior: 'smooth', block: 'center' },
+  }}
+  containerStyle={{ maxHeight: '80vh', overflow: 'auto' }}
+>
+  <LegalDocument content={contract} />
+</SearchableContent>
+```
+
+### 9. E-Commerce Product Listings
+```tsx
+<SearchableContent
+  searchOptions={{
+    minSearchLength: 2,
+    highlightColor: 'rgba(34, 197, 94, 0.3)',
+    excludeSelector: '.price, .rating',
+  }}
+  searchPlaceholder="Search products..."
+>
+  <ProductGrid products={products} />
+</SearchableContent>
+```
+
+### 10. Help Center / Wiki
+```tsx
+<SearchableContent
+  searchOptions={{
+    normalizeText: (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, ''),
+  }}
+  searchBoxTooltips={{
+    previousButton: 'Previous result',
+    nextButton: 'Next result',
+    closeButton: 'Close search',
+  }}
+>
+  <WikiArticle content={article} />
+</SearchableContent>
+```
+
+### 11. Email / Inbox Search
+```tsx
+<SearchableContent
+  searchOptions={{ caseSensitive: false, debounceMs: 200 }}
+  searchBoxPosition="top-right"
+  searchCallbacks={{
+    onSearchComplete: (term, count) =>
+      analytics.track('inbox_search', { term, results: count }),
+  }}
+>
+  <EmailThread messages={thread} />
+</SearchableContent>
+```
+
+### 12. Dashboard with Dynamic Content
+```tsx
+function Dashboard({ data }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { search, refresh, matches, currentIndex, ...rest } =
+    useSearchableContent(containerRef);
+
+  // Refresh highlights when dashboard data changes
+  useEffect(() => { refresh(); }, [data, refresh]);
+
+  return (
+    <div ref={containerRef}>
+      <DashboardWidgets data={data} />
+    </div>
+  );
+}
+```
+
 ---
 
 ## Default CSS Class Names
