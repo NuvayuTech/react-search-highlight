@@ -222,8 +222,8 @@ describe('yieldToMainThread', () => {
   });
 
   it('resolves via requestAnimationFrame when requestIdleCallback is not available', async () => {
-    const originalRIC = (window as Record<string, unknown>).requestIdleCallback;
-    delete (window as Record<string, unknown>).requestIdleCallback;
+    const originalRIC = (window as unknown as Record<string, unknown>).requestIdleCallback;
+    delete (window as unknown as Record<string, unknown>).requestIdleCallback;
 
     const rafSpy = jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
       cb(0);
@@ -235,6 +235,6 @@ describe('yieldToMainThread', () => {
 
     expect(rafSpy).toHaveBeenCalled();
     rafSpy.mockRestore();
-    (window as Record<string, unknown>).requestIdleCallback = originalRIC;
+    (window as unknown as Record<string, unknown>).requestIdleCallback = originalRIC;
   });
 });

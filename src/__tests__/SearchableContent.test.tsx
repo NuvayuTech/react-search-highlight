@@ -143,7 +143,7 @@ describe('SearchableContent', () => {
     const { useSearchableContent } = require('../useSearchableContent');
 
     const opts = { highlightColor: 'red' };
-    const cbs = { onSearchOpen: jest.fn() };
+    const cbs = { onSearchStart: jest.fn() };
 
     render(
       <SearchableContent searchOptions={opts} searchCallbacks={cbs}>
