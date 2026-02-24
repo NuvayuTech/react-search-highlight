@@ -832,8 +832,6 @@ export const useSearchableContent = (
       }
 
       clearHighlights();
-      setMatches([]);
-      setCurrentIndex(-1);
       setIsSearching(true);
       debouncedSearch(term);
     },

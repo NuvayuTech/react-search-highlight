@@ -28,6 +28,19 @@ A lightweight, fully customizable React component for adding in-page text search
 npm install react-search-highlight
 ```
 
+## Try the Demo
+
+The repo includes an interactive demo with 6 test scenarios (basic usage, styled, advanced options, hook API, large content, and custom render). To run it locally:
+
+```bash
+git clone https://github.com/NuvayuTech/react-search-highlight.git
+cd react-search-highlight
+npm install
+npm run dev
+```
+
+Open the URL printed in the terminal (usually `http://localhost:5173`).
+
 ## Quick Start
 
 ```tsx

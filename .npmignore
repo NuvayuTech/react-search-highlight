@@ -1,4 +1,6 @@
 src
+dev
+vite.config.ts
 tsconfig.json
 rollup.config.js
 .gitignore

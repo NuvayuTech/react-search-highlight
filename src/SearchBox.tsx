@@ -196,17 +196,85 @@ const defaultIcons: Required<SearchBoxIcons> = {
 };
 
 const defaultClassNames: Required<SearchBoxClassNames> = {
-  container:
-    'search-box-container absolute z-10 flex items-center rounded-2xl border bg-white px-6 py-3 gap-4 shadow-lg',
-  inputWrapper: 'search-box-input-wrapper flex flex-1 gap-2 items-center',
-  input:
-    'search-box-input flex-1 p-2 bg-transparent outline-none text-sm',
-  counter: 'search-box-counter mx-2 text-sm whitespace-nowrap',
-  button: 'search-box-button cursor-pointer p-1 hover:bg-gray-100 rounded transition-colors',
-  buttonDisabled: 'search-box-button-disabled opacity-50 cursor-not-allowed',
-  divider: 'search-box-divider w-px h-6 bg-gray-300 mx-2',
-  iconWrapper: 'search-box-icon flex items-center justify-center',
+  container: 'search-box-container',
+  inputWrapper: 'search-box-input-wrapper',
+  input: 'search-box-input',
+  counter: 'search-box-counter',
+  button: 'search-box-button',
+  buttonDisabled: 'search-box-button-disabled',
+  divider: 'search-box-divider',
+  iconWrapper: 'search-box-icon',
   spinner: 'search-box-spinner',
+};
+
+// ─── Default inline styles (looks good out-of-the-box, no CSS framework needed) ─
+
+const defaultStyles = {
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    padding: '8px 16px',
+    background: '#ffffff',
+    border: '1px solid #e2e8f0',
+    borderRadius: 12,
+    boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.06)',
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+    zIndex: 10,
+  } as React.CSSProperties,
+  inputWrapper: {
+    display: 'flex',
+    flex: 1,
+    gap: 8,
+    alignItems: 'center',
+  } as React.CSSProperties,
+  input: {
+    flex: 1,
+    padding: '6px 8px',
+    background: 'transparent',
+    outline: 'none',
+    border: 'none',
+    fontSize: 14,
+    color: '#1e293b',
+    minWidth: 140,
+  } as React.CSSProperties,
+  counter: {
+    margin: '0 4px',
+    fontSize: 13,
+    whiteSpace: 'nowrap' as const,
+    color: '#64748b',
+    userSelect: 'none' as const,
+    minWidth: 50,
+    textAlign: 'center' as const,
+  } as React.CSSProperties,
+  button: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+    background: 'transparent',
+    border: 'none',
+    borderRadius: 6,
+    cursor: 'pointer',
+    color: '#475569',
+    transition: 'background 0.15s, color 0.15s',
+  } as React.CSSProperties,
+  buttonDisabled: {
+    opacity: 0.35,
+    cursor: 'not-allowed',
+  } as React.CSSProperties,
+  divider: {
+    width: 1,
+    height: 20,
+    background: '#e2e8f0',
+    margin: '0 4px',
+  } as React.CSSProperties,
+  iconWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'inherit',
+  } as React.CSSProperties,
 };
 
 const positionStyles: Record<Exclude<SearchBoxPosition, 'custom'>, React.CSSProperties> = {
@@ -226,10 +294,7 @@ const defaultAriaLabels: Required<SearchBoxAriaLabels> = {
   matchStatus: '{current} of {total} matches',
 };
 
-const getSearchStatus = (isSearching: boolean, totalMatches: number, currentIndex: number): string => {
-  if (isSearching) {
-    return 'Searching...';
-  }
+const getSearchStatus = (_isSearching: boolean, totalMatches: number, currentIndex: number): string => {
   if (totalMatches > 0) {
     return `${currentIndex + 1}/${totalMatches}`;
   }
@@ -340,13 +405,13 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   return (
     <div
       className={mergedClassNames.container}
-      style={computedStyle}
+      style={{ ...defaultStyles.container, ...computedStyle }}
       role="search"
       aria-label="In-page search"
     >
-      <div className={mergedClassNames.inputWrapper}>
-        <div className={mergedClassNames.iconWrapper}>
-          {isSearching ? mergedIcons.loading : mergedIcons.search}
+      <div className={mergedClassNames.inputWrapper} style={defaultStyles.inputWrapper}>
+        <div className={mergedClassNames.iconWrapper} style={{ ...defaultStyles.iconWrapper, color: '#94a3b8' }}>
+          {mergedIcons.search}
         </div>
         <input
           ref={searchInputRef}
@@ -356,6 +421,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           className={mergedClassNames.input}
+          style={defaultStyles.input}
           autoFocus
           aria-label={mergedAriaLabels.searchInput}
           role="searchbox"
@@ -364,6 +430,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
       <span
         className={mergedClassNames.counter}
+        style={defaultStyles.counter}
         role="status"
         aria-live="polite"
         aria-label={ariaMatchStatus}
@@ -375,11 +442,15 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         type="button"
         onClick={onPrevious}
         disabled={isPreviousDisabled}
-        title="Previous"
+        title="Previous (Shift+Enter)"
         className={`${mergedClassNames.button} ${isPreviousDisabled ? mergedClassNames.buttonDisabled : ''}`}
+        style={{
+          ...defaultStyles.button,
+          ...(isPreviousDisabled ? defaultStyles.buttonDisabled : {}),
+        }}
         aria-label={mergedAriaLabels.previousButton}
       >
-        <div className={mergedClassNames.iconWrapper}>{mergedIcons.previous}</div>
+        <div className={mergedClassNames.iconWrapper} style={defaultStyles.iconWrapper}>{mergedIcons.previous}</div>
       </button>
 
       <button
@@ -388,21 +459,26 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         disabled={isNextDisabled}
         title="Next (Enter)"
         className={`${mergedClassNames.button} ${isNextDisabled ? mergedClassNames.buttonDisabled : ''}`}
+        style={{
+          ...defaultStyles.button,
+          ...(isNextDisabled ? defaultStyles.buttonDisabled : {}),
+        }}
         aria-label={mergedAriaLabels.nextButton}
       >
-        <div className={mergedClassNames.iconWrapper}>{mergedIcons.next}</div>
+        <div className={mergedClassNames.iconWrapper} style={defaultStyles.iconWrapper}>{mergedIcons.next}</div>
       </button>
 
-      <div className={mergedClassNames.divider} />
+      <div className={mergedClassNames.divider} style={defaultStyles.divider} />
 
       <button
         type="button"
         onClick={onClose}
         title="Close (Escape)"
         className={mergedClassNames.button}
+        style={defaultStyles.button}
         aria-label={mergedAriaLabels.closeButton}
       >
-        <div className={mergedClassNames.iconWrapper}>{mergedIcons.close}</div>
+        <div className={mergedClassNames.iconWrapper} style={defaultStyles.iconWrapper}>{mergedIcons.close}</div>
       </button>
     </div>
   );
