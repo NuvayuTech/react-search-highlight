@@ -83,7 +83,9 @@ export const useSearchableContent = (
 
   // Keep callbacks in a ref to avoid stale closures
   const callbacksRef = useRef(callbacks);
-  callbacksRef.current = callbacks;
+  useEffect(() => {
+    callbacksRef.current = callbacks;
+  });
 
   // ─── Resolve options with defaults ─────────────────────────────────
   const config = useMemo<ResolvedSearchOptions>(
