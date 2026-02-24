@@ -206,9 +206,9 @@ const defaultAriaLabels: Required<SearchBoxAriaLabels> = {
 };
 
 const defaultTooltips: Required<SearchBoxTooltips> = {
-  previousButton: 'Previous (Shift+Enter)',
-  nextButton: 'Next (Enter)',
-  closeButton: 'Close (Escape)',
+  previousButton: '',
+  nextButton: '',
+  closeButton: '',
 };
 
 const getSearchStatus = (_isSearching: boolean, totalMatches: number, currentIndex: number): string => {
@@ -365,7 +365,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         type="button"
         onClick={onPrevious}
         disabled={isPreviousDisabled}
-        title={mergedTooltips.previousButton}
+        title={mergedTooltips.previousButton || undefined}
         className={`${mergedClassNames.button} ${isPreviousDisabled ? mergedClassNames.buttonDisabled : ''}`}
         style={{
           ...defaultStyles.button,
@@ -380,7 +380,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         type="button"
         onClick={onNext}
         disabled={isNextDisabled}
-        title={mergedTooltips.nextButton}
+        title={mergedTooltips.nextButton || undefined}
         className={`${mergedClassNames.button} ${isNextDisabled ? mergedClassNames.buttonDisabled : ''}`}
         style={{
           ...defaultStyles.button,
@@ -396,7 +396,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
       <button
         type="button"
         onClick={onClose}
-        title={mergedTooltips.closeButton}
+        title={mergedTooltips.closeButton || undefined}
         className={mergedClassNames.button}
         style={defaultStyles.button}
         aria-label={mergedAriaLabels.closeButton}
