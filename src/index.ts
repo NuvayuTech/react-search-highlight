@@ -28,5 +28,6 @@ export type {
   SearchBoxIcons,
   SearchBoxPosition,
   SearchBoxAriaLabels,
+  SearchBoxTooltips,
   SearchBoxRenderProps,
 } from './types';

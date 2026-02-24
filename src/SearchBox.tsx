@@ -5,6 +5,7 @@ import type {
   SearchBoxIcons,
   SearchBoxPosition,
   SearchBoxAriaLabels,
+  SearchBoxTooltips,
   SearchBoxRenderProps,
   SearchBoxProps,
 } from './types';
@@ -15,6 +16,7 @@ export type {
   SearchBoxIcons,
   SearchBoxPosition,
   SearchBoxAriaLabels,
+  SearchBoxTooltips,
   SearchBoxRenderProps,
   SearchBoxProps,
 };
@@ -203,6 +205,12 @@ const defaultAriaLabels: Required<SearchBoxAriaLabels> = {
   matchStatus: '{current} of {total} matches',
 };
 
+const defaultTooltips: Required<SearchBoxTooltips> = {
+  previousButton: 'Previous (Shift+Enter)',
+  nextButton: 'Next (Enter)',
+  closeButton: 'Close (Escape)',
+};
+
 const getSearchStatus = (_isSearching: boolean, totalMatches: number, currentIndex: number): string => {
   if (totalMatches > 0) {
     return `${currentIndex + 1}/${totalMatches}`;
@@ -231,6 +239,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   position = 'top-right',
   containerStyle,
   ariaLabels = {},
+  tooltips = {},
   renderSearchBox,
 }) => {
   const totalMatches = matches.length;
@@ -248,6 +257,11 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
   const mergedAriaLabels = {
     ...defaultAriaLabels,
     ...ariaLabels,
+  };
+
+  const mergedTooltips = {
+    ...defaultTooltips,
+    ...tooltips,
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -351,7 +365,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         type="button"
         onClick={onPrevious}
         disabled={isPreviousDisabled}
-        title="Previous (Shift+Enter)"
+        title={mergedTooltips.previousButton}
         className={`${mergedClassNames.button} ${isPreviousDisabled ? mergedClassNames.buttonDisabled : ''}`}
         style={{
           ...defaultStyles.button,
@@ -366,7 +380,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
         type="button"
         onClick={onNext}
         disabled={isNextDisabled}
-        title="Next (Enter)"
+        title={mergedTooltips.nextButton}
         className={`${mergedClassNames.button} ${isNextDisabled ? mergedClassNames.buttonDisabled : ''}`}
         style={{
           ...defaultStyles.button,
@@ -382,7 +396,7 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
       <button
         type="button"
         onClick={onClose}
-        title="Close (Escape)"
+        title={mergedTooltips.closeButton}
         className={mergedClassNames.button}
         style={defaultStyles.button}
         aria-label={mergedAriaLabels.closeButton}

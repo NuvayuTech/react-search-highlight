@@ -214,6 +214,16 @@ export type SearchBoxPosition =
   | 'bottom-center'
   | 'custom';
 
+/** Tooltip text (title attribute) for search box buttons */
+export interface SearchBoxTooltips {
+  /** Tooltip for previous button (default: 'Previous (Shift+Enter)') */
+  previousButton?: string;
+  /** Tooltip for next button (default: 'Next (Enter)') */
+  nextButton?: string;
+  /** Tooltip for close button (default: 'Close (Escape)') */
+  closeButton?: string;
+}
+
 /** ARIA labels for i18n / accessibility customization */
 export interface SearchBoxAriaLabels {
   /** Label for the search input (default: 'Search text') */
@@ -278,6 +288,8 @@ export interface SearchBoxProps {
   containerStyle?: React.CSSProperties;
   /** Custom ARIA labels for accessibility / i18n */
   ariaLabels?: SearchBoxAriaLabels;
+  /** Custom tooltip text for buttons */
+  tooltips?: SearchBoxTooltips;
   /** Render function for completely custom search box UI */
   renderSearchBox?: (props: SearchBoxRenderProps) => React.ReactNode;
 }

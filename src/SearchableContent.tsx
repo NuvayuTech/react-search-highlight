@@ -9,6 +9,7 @@ import type {
   SearchBoxIcons,
   SearchBoxPosition,
   SearchBoxAriaLabels,
+  SearchBoxTooltips,
   SearchBoxRenderProps,
 } from './types';
 
@@ -39,6 +40,8 @@ export interface SearchableContentProps {
   searchBoxStyle?: React.CSSProperties;
   /** Custom ARIA labels for accessibility / i18n */
   searchBoxAriaLabels?: SearchBoxAriaLabels;
+  /** Custom tooltip text for search box buttons */
+  searchBoxTooltips?: SearchBoxTooltips;
   /** Render function for completely custom search box UI */
   renderSearchBox?: (props: SearchBoxRenderProps) => React.ReactNode;
 }
@@ -81,6 +84,7 @@ export const SearchableContent: React.FC<SearchableContentProps> = ({
   searchBoxPosition,
   searchBoxStyle,
   searchBoxAriaLabels,
+  searchBoxTooltips,
   renderSearchBox,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -127,6 +131,7 @@ export const SearchableContent: React.FC<SearchableContentProps> = ({
         position={searchBoxPosition}
         containerStyle={searchBoxStyle}
         ariaLabels={searchBoxAriaLabels}
+        tooltips={searchBoxTooltips}
         renderSearchBox={renderSearchBox}
       />
     </>
