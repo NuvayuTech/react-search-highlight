@@ -56,6 +56,13 @@ import { SearchableContent } from 'react-search-highlight';
   containerClassName="your-container-class"
   isSearchBlocked={false}
   onSearchOpenChange={(isOpen) => console.log(isOpen)}
+  
+  // Optional tooltips (none shown by default)
+  searchBoxTooltips={{
+    previousButton: 'Previous match (Shift+Enter)',
+    nextButton: 'Next match (Enter)',
+    closeButton: 'Close search (Escape)',
+  }}
 />
 ```
 
@@ -247,6 +254,7 @@ import type {
   SearchBoxProps,
   SearchBoxClassNames,
   SearchBoxIcons,
+  SearchBoxTooltips,
   SearchOptions,
   UseSearchableContentReturn,
   Match,

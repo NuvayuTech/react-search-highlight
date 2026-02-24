@@ -116,6 +116,7 @@ Main component that wraps your searchable content.
 | `searchBoxPosition` | `SearchBoxPosition` | `'top-right'` | Where to place the search box |
 | `searchBoxStyle` | `React.CSSProperties` | — | Inline styles for search box |
 | `searchBoxAriaLabels` | `SearchBoxAriaLabels` | — | Custom ARIA labels for i18n |
+| `searchBoxTooltips` | `SearchBoxTooltips` | — | Custom tooltip text for buttons |
 | `renderSearchBox` | `(props: SearchBoxRenderProps) => ReactNode` | — | Completely custom search box render |
 
 ---
@@ -362,6 +363,34 @@ interface SearchBoxAriaLabels {
     matchStatus: '{current} de {total} resultados',
   }}
 >
+```
+
+---
+
+### SearchBoxTooltips
+
+Customize the tooltip text (native `title` attribute) shown on hover for each button. **No tooltips are shown by default** — set only the ones you want.
+
+```typescript
+interface SearchBoxTooltips {
+  previousButton?: string;   // Tooltip for previous button
+  nextButton?: string;       // Tooltip for next button
+  closeButton?: string;      // Tooltip for close button
+}
+```
+
+**Example:**
+
+```tsx
+<SearchableContent
+  searchBoxTooltips={{
+    previousButton: 'Previous match (Shift+Enter)',
+    nextButton: 'Next match (Enter)',
+    closeButton: 'Close search (Escape)',
+  }}
+>
+  <YourContent />
+</SearchableContent>
 ```
 
 ---
@@ -636,6 +665,7 @@ import type {
   SearchBoxIcons,
   SearchBoxPosition,
   SearchBoxAriaLabels,
+  SearchBoxTooltips,
   SearchBoxRenderProps,
   Match,
   TextRange,
@@ -708,4 +738,4 @@ Contributions are welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
-MIT © [Your Name]
+MIT © [NuvayuTech](https://github.com/NuvayuTech)

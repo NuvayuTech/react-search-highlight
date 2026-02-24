@@ -674,6 +674,7 @@ function CompletelyCustomSearch() {
 
 - **CSS Classes**: Use `searchBoxClassNames` to customize every visual element
 - **Icons**: Use `searchBoxIcons` to replace all icons with your own components
+- **Tooltips**: Use `searchBoxTooltips` to add hover tooltips to buttons (none by default)
 - **Full Control**: Use the `useSearchableContent` hook for complete customization
 - **Theming**: Create reusable theme objects for consistent styling
 

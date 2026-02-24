@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-02-25
+
+### Added
+- `searchBoxTooltips` / `tooltips` prop — customizable tooltip text for Previous, Next, and Close buttons (no tooltips by default; opt-in only)
+- `SearchBoxTooltips` type exported from the package
+
+### Fixed
+- React StrictMode compatibility — `isMountedRef` is now reset to `true` on remount, preventing silent no-ops in `safeRAF` callbacks and `processHighlightsAsync`
+- Memory leak prevention — uncancelled `requestAnimationFrame` callbacks and post-unmount `setState` calls are now properly guarded via `safeRAF` helper and `isMountedRef`
+- Previous/Next buttons no longer flicker (disable/enable) while typing — buttons stay enabled as long as matches exist from the previous search
+- ESLint errors resolved — `FrameRequestCallback` type, `cancelAnimationFrame` global, and `rafIdsRef.current` in effect cleanup
+
 ## [1.0.0] - 2026-02-24
 
 ### Added
@@ -44,4 +56,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Whole word matching option
 - Responsive and mobile-friendly
 
-[1.0.0]: https://github.com/yourusername/react-search-highlight/releases/tag/v1.0.0
+[1.0.1]: https://github.com/NuvayuTech/react-search-highlight/releases/tag/v1.0.1
+[1.0.0]: https://github.com/NuvayuTech/react-search-highlight/releases/tag/v1.0.0
