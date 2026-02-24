@@ -165,7 +165,7 @@ const defaultStyles = {
     borderRadius: 6,
     cursor: 'pointer',
     color: 'inherit',
-    transition: 'background 0.15s, color 0.15s',
+    transition: 'background 0.15s, color 0.15s, opacity 0.15s',
   } as React.CSSProperties,
   buttonDisabled: {
     opacity: 0.35,
@@ -273,8 +273,8 @@ export const SearchBox: React.FC<SearchBoxProps> = ({
 
   if (!isSearchOpen) return null;
 
-  const isPreviousDisabled = totalMatches === 0 || isSearching;
-  const isNextDisabled = totalMatches === 0 || isSearching;
+  const isPreviousDisabled = totalMatches === 0;
+  const isNextDisabled = totalMatches === 0;
   const statusText = getSearchStatus(isSearching, totalMatches, currentIndex);
 
   // If a custom render is provided, use it

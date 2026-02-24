@@ -98,13 +98,13 @@ describe('SearchBox', () => {
     expect(nextBtn).not.toBeDisabled();
   });
 
-  it('disables prev/next when isSearching is true', () => {
+  it('keeps prev/next enabled while isSearching when matches exist', () => {
     const matches = [{ index: 0, highlights: [], text: 'a' }] as Match[];
     renderSearchBox({ matches, currentIndex: 0, isSearching: true });
     const prevBtn = screen.getByLabelText('Previous match');
     const nextBtn = screen.getByLabelText('Next match');
-    expect(prevBtn).toBeDisabled();
-    expect(nextBtn).toBeDisabled();
+    expect(prevBtn).not.toBeDisabled();
+    expect(nextBtn).not.toBeDisabled();
   });
 
   it('calls onPrevious when prev button is clicked', () => {
