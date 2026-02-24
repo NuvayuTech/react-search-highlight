@@ -90,7 +90,7 @@ export const useSearchableContent = (
   });
 
   /** Schedule a `requestAnimationFrame` that is automatically cancelled on unmount. */
-  const safeRAF = useCallback((callback: FrameRequestCallback) => {
+  const safeRAF = useCallback((callback: (time: number) => void) => {
     const id = requestAnimationFrame((time) => {
       rafIdsRef.current.delete(id);
       if (isMountedRef.current) {
@@ -708,15 +708,16 @@ export const useSearchableContent = (
   // ─── Cleanup on unmount ────────────────────────────────────────────
 
   useEffect(() => {
+    const rafIds = rafIdsRef.current;
     return () => {
       // Mark unmounted so safeRAF callbacks are suppressed
       isMountedRef.current = false;
 
       // Cancel any pending requestAnimationFrame callbacks
-      for (const id of rafIdsRef.current) {
-        cancelAnimationFrame(id);
+      for (const id of rafIds) {
+        window.cancelAnimationFrame(id);
       }
-      rafIdsRef.current.clear();
+      rafIds.clear();
 
       // Cancel any in-flight async highlight work
       activeSearchTermRef.current = '';
