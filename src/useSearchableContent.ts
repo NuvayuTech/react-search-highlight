@@ -75,6 +75,8 @@ export const useSearchableContent = (
   const highlightsRef = useRef<HTMLDivElement[]>([]);
   const activeSearchTermRef = useRef('');
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const rafIdsRef = useRef<Set<number>>(new Set());
+  const isMountedRef = useRef(true);
 
   // Cached text-node metadata
   const textNodesRef = useRef<TextNodeInfo[]>([]);
@@ -86,6 +88,18 @@ export const useSearchableContent = (
   useEffect(() => {
     callbacksRef.current = callbacks;
   });
+
+  /** Schedule a `requestAnimationFrame` that is automatically cancelled on unmount. */
+  const safeRAF = useCallback((callback: FrameRequestCallback) => {
+    const id = requestAnimationFrame((time) => {
+      rafIdsRef.current.delete(id);
+      if (isMountedRef.current) {
+        callback(time);
+      }
+    });
+    rafIdsRef.current.add(id);
+    return id;
+  }, []);
 
   // ─── Resolve options with defaults ─────────────────────────────────
   const config = useMemo<ResolvedSearchOptions>(
@@ -417,7 +431,7 @@ export const useSearchableContent = (
       }
 
       // ── Final cancellation check ──
-      if (activeSearchTermRef.current !== term) {
+      if (activeSearchTermRef.current !== term || !isMountedRef.current) {
         clearHighlights();
         setIsSearching(false);
         return;
@@ -436,7 +450,7 @@ export const useSearchableContent = (
       if (matchObjects.length > 0) {
         setCurrentIndex(0);
         callbacksRef.current.onCurrentMatchChange?.(matchObjects[0], 0);
-        requestAnimationFrame(() => {
+        safeRAF(() => {
           if (
             activeSearchTermRef.current === term &&
             matchObjects[0]?.highlights?.length > 0
@@ -462,6 +476,7 @@ export const useSearchableContent = (
       computeTextNodes,
       config,
       containerRef,
+      safeRAF,
     ]
   );
 
@@ -556,7 +571,7 @@ export const useSearchableContent = (
         newIndex
       );
 
-      requestAnimationFrame(() => {
+      safeRAF(() => {
         // Reset all highlights to default color
         for (const h of highlightsRef.current) {
           h.style.backgroundColor = config.highlightColor;
@@ -587,6 +602,7 @@ export const useSearchableContent = (
       config.currentHighlightColor,
       config.scrollOptions,
       config.highlightStyle.activeClassName,
+      safeRAF,
     ]
   );
 
@@ -606,12 +622,12 @@ export const useSearchableContent = (
     if (isBlocked) return;
 
     setIsSearchOpen(true);
-    requestAnimationFrame(() => {
+    safeRAF(() => {
       if (searchInputRef.current) {
         searchInputRef.current.focus();
       }
     });
-  }, [isBlocked]);
+  }, [isBlocked, safeRAF]);
 
   const closeSearch = useCallback(() => {
     setIsSearchOpen(false);
@@ -693,6 +709,15 @@ export const useSearchableContent = (
 
   useEffect(() => {
     return () => {
+      // Mark unmounted so safeRAF callbacks are suppressed
+      isMountedRef.current = false;
+
+      // Cancel any pending requestAnimationFrame callbacks
+      for (const id of rafIdsRef.current) {
+        cancelAnimationFrame(id);
+      }
+      rafIdsRef.current.clear();
+
       // Cancel any in-flight async highlight work
       activeSearchTermRef.current = '';
       removeOverlay();
