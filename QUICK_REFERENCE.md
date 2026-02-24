@@ -3,13 +3,13 @@
 ## Installation
 
 ```bash
-npm install react-search-highlight
+npm install @nuvayutech/react-search-highlight
 ```
 
 ## Basic Usage
 
 ```tsx
-import { SearchableContent } from 'react-search-highlight';
+import { SearchableContent } from '@nuvayutech/react-search-highlight';
 
 <SearchableContent>
   <YourContent />
@@ -207,7 +207,7 @@ searchBoxIcons={{
 For complete control, use the hook directly:
 
 ```tsx
-import { useSearchableContent } from 'react-search-highlight';
+import { useSearchableContent } from '@nuvayutech/react-search-highlight';
 
 function MyComponent() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -259,7 +259,7 @@ import type {
   UseSearchableContentReturn,
   Match,
   TextRange,
-} from 'react-search-highlight';
+} from '@nuvayutech/react-search-highlight';
 ```
 
 ## Common Patterns

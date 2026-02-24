@@ -1,4 +1,4 @@
-# react-search-highlight
+# @nuvayutech/react-search-highlight
 
 A lightweight, fully customizable React component for adding in-page text search with visual highlighting to any content. Searches all text within the wrapped container (including nested elements). Features customizable keyboard shortcuts, match navigation, lifecycle callbacks, and complete styling control. Built with TypeScript and zero dependencies (except React).
 
@@ -25,7 +25,7 @@ A lightweight, fully customizable React component for adding in-page text search
 ## Installation
 
 ```bash
-npm install react-search-highlight
+npm install @nuvayutech/react-search-highlight
 ```
 
 ## Try the Demo
@@ -44,7 +44,7 @@ Open the URL printed in the terminal (usually `http://localhost:5173`).
 ## Quick Start
 
 ```tsx
-import { SearchableContent } from 'react-search-highlight';
+import { SearchableContent } from '@nuvayutech/react-search-highlight';
 
 function App() {
   return (
@@ -482,7 +482,7 @@ Preprocess text before matching (e.g., remove accents):
 For advanced use cases, use the hook directly to build your own UI.
 
 ```typescript
-import { useSearchableContent } from 'react-search-highlight';
+import { useSearchableContent } from '@nuvayutech/react-search-highlight';
 
 function CustomSearchComponent() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -675,7 +675,7 @@ import type {
   PerformanceOptions,
   SearchCallbacks,
   UseSearchableContentReturn,
-} from 'react-search-highlight';
+} from '@nuvayutech/react-search-highlight';
 ```
 
 ---

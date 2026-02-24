@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2026-02-25
 
 ### Added
-- Initial release of react-search-highlight
+- Initial release of @nuvayutech/react-search-highlight
 - `SearchableContent` component for making any content searchable
 - `SearchBox` component with customizable UI
 - `useSearchableContent` hook for advanced use cases

@@ -1,4 +1,4 @@
-# Contributing to react-search-highlight
+# Contributing to @nuvayutech/react-search-highlight
 
 Thank you for your interest in contributing! This document provides guidelines and instructions for contributing to this project.
 
@@ -74,12 +74,12 @@ npm link
 
 3. In your test project:
 ```bash
-npm link react-search-highlight
+npm link @nuvayutech/react-search-highlight
 ```
 
 4. Import and use:
 ```tsx
-import { SearchableContent } from 'react-search-highlight';
+import { SearchableContent } from '@nuvayutech/react-search-highlight';
 ```
 
 ### Type Checking

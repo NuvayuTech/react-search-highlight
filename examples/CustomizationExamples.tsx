@@ -4,7 +4,7 @@
  * This file demonstrates various ways to customize the SearchableContent component
  * with different styling approaches and icon libraries.
  * 
- * Note: After publishing to npm, use: import { SearchableContent, useSearchableContent } from 'react-search-highlight';
+ * Note: After publishing to npm, use: import { SearchableContent, useSearchableContent } from '@nuvayutech/react-search-highlight';
  * For local development, use the dist build or link the package
  */
 

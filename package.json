@@ -1,5 +1,5 @@
 {
-  "name": "react-search-highlight",
+  "name": "@nuvayutech/react-search-highlight",
   "version": "1.0.0",
   "description": "A generic React component for making any content searchable with text highlighting",
   "type": "module",

@@ -1,5 +1,5 @@
 import React from 'react';
-// Note: After publishing to npm, use: import { SearchableContent, useSearchableContent } from 'react-search-highlight';
+// Note: After publishing to npm, use: import { SearchableContent, useSearchableContent } from '@nuvayutech/react-search-highlight';
 // For local development, use the dist build or link the package
 import { SearchableContent, useSearchableContent } from './src/index';
 

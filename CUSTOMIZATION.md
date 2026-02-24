@@ -1,6 +1,6 @@
 # Customization Guide
 
-This guide shows you how to fully customize the appearance and icons of `react-search-highlight`.
+This guide shows you how to fully customize the appearance and icons of `@nuvayutech/react-search-highlight`.
 
 ## Table of Contents
 - [Custom CSS Classes](#custom-css-classes)
@@ -618,7 +618,7 @@ function ThemedSearchableContent() {
 For complete control, use the `useSearchableContent` hook directly:
 
 ```tsx
-import { useSearchableContent } from 'react-search-highlight';
+import { useSearchableContent } from '@nuvayutech/react-search-highlight';
 import { useRef } from 'react';
 
 function CompletelyCustomSearch() {
