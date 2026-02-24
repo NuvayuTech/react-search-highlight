@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { SearchableContent, useSearchableContent } from '../src';
-import type { Match } from '../src';
 
 /**
  * Test file — delete after manual testing.
