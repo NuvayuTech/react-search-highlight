@@ -708,6 +708,9 @@ export const useSearchableContent = (
   // ─── Cleanup on unmount ────────────────────────────────────────────
 
   useEffect(() => {
+    // Re-mark as mounted (needed for React StrictMode double-invoke)
+    isMountedRef.current = true;
+
     const rafIds = rafIdsRef.current;
     return () => {
       // Mark unmounted so safeRAF callbacks are suppressed
